@@ -56,7 +56,7 @@ func processes() ([]Process, error) {
 
 	results := make([]Process, 0, 50)
 	for {
-		names, err := d.Readdirnames(10)
+		fis, err := d.Readdirnames(10)
 		if err == io.EOF {
 			break
 		}
@@ -64,8 +64,14 @@ func processes() ([]Process, error) {
 			return nil, err
 		}
 
-		for _, name := range names {
+		for _, fi := range fis {
+			// We only care about directories, since all pids are dirs
+			if !fi.IsDir() {
+				continue
+			}
+
 			// We only care if the name starts with a numeric
+			name := fi.Name()
 			if name[0] < '0' || name[0] > '9' {
 				continue
 			}
@@ -82,7 +88,9 @@ func processes() ([]Process, error) {
 				continue
 			}
 
-			results = append(results, p)
+			if string(p.state) != "Z" {
+				results = append(results, p)
+			}
 		}
 	}
 
