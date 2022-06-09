@@ -56,7 +56,7 @@ func processes() ([]Process, error) {
 
 	results := make([]Process, 0, 50)
 	for {
-		fis, err := d.Readdirnames(10)
+		fis, err := d.Readdir(10)
 		if err == io.EOF {
 			break
 		}
